@@ -75,7 +75,15 @@ func (h *Handler) Do() {
 
 	for i := 0; i < len(h.receivers); i++ {
 		v := reflect.ValueOf(h.receivers[i])
-		v.Elem().Set(out[i])
+		ov := out[i]
+		if ov.Type().Kind() != reflect.Ptr {
+			v.Elem().Set(out[i])
+		} else {
+			if !ov.IsNil() {
+				v.Elem().Set(out[i].Elem())
+			}
+			//else 不能返回空，故不设置返回值
+		}
 	}
 }
 
