@@ -1,6 +1,8 @@
 package parallel
 
 import (
+	"fmt"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -100,7 +102,9 @@ func (p *Parallel) secure(pipe *Pipeline) {
 				panic(err)
 			}
 			if p.exception != nil {
-				p.exception.OnExcept(err)
+				buf := make([]byte, 1<<16)
+				runtime.Stack(buf, true)
+				p.exception.OnExcept(fmt.Sprintf("panic:%v \r\n%s", err, buf))
 			}
 		}
 		p.wg.Done()
